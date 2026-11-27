@@ -4,12 +4,13 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/MotionControllerComponent.h"
 #include "Components/SceneComponent.h"
+#include "Engine/OverlapResult.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Interaction/Interactable.h"
+#include "MotionControllerComponent.h"
 
 namespace
 {
@@ -35,12 +36,10 @@ AHeritageVRPawn::AHeritageVRPawn()
 	LeftHand = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("LeftHand"));
 	LeftHand->SetupAttachment(VRRoot);
 	LeftHand->SetTrackingSource(EControllerHand::Left);
-	LeftHand->SetShowDeviceModel(true);
 
 	RightHand = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightHand"));
 	RightHand->SetupAttachment(VRRoot);
 	RightHand->SetTrackingSource(EControllerHand::Right);
-	RightHand->SetShowDeviceModel(true);
 }
 
 void AHeritageVRPawn::BeginPlay()
@@ -138,14 +137,14 @@ void AHeritageVRPawn::OnGrabPressed(UMotionControllerComponent* Hand)
 		return;
 	}
 
-	UInteractable* Candidate = FindInteractableNearHand(Hand);
+	AActor* Candidate = FindInteractableNearHand(Hand);
 	if (!Candidate)
 	{
 		return;
 	}
 
-	Candidate->SetFocused(true);
-	Candidate->Grab(Hand);
+	IInteractable::Execute_SetFocused(Candidate, true);
+	IInteractable::Execute_Grab(Candidate, Hand);
 	GrabbedObject = Candidate;
 	GrabbingHand = Hand;
 }
@@ -154,7 +153,7 @@ void AHeritageVRPawn::OnGrabReleased(UMotionControllerComponent* Hand)
 {
 	if (GrabbedObject.IsValid() && GrabbingHand.Get() == Hand)
 	{
-		GrabbedObject->Release(Hand);
+		IInteractable::Execute_Release(GrabbedObject.Get(), Hand);
 		GrabbedObject = nullptr;
 		GrabbingHand = nullptr;
 	}
@@ -180,7 +179,7 @@ bool AHeritageVRPawn::TryGetTeleportDestination(FVector& OutLocation) const
 	return true;
 }
 
-UInteractable* AHeritageVRPawn::FindInteractableNearHand(UMotionControllerComponent* Hand) const
+AActor* AHeritageVRPawn::FindInteractableNearHand(UMotionControllerComponent* Hand) const
 {
 	const UWorld* World = GetWorld();
 	if (!World || !Hand)
@@ -202,9 +201,9 @@ UInteractable* AHeritageVRPawn::FindInteractableNearHand(UMotionControllerCompon
 		{
 			continue;
 		}
-		if (UInteractable* Candidate = Cast<UInteractable>(OverlappedActor))
+		if (OverlappedActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 		{
-			return Candidate;
+			return OverlappedActor;
 		}
 	}
 	return nullptr;

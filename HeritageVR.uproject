@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.4",
+	"EngineAssociation": "5.5",
 	"Category": "",
 	"Description": "Heritage VR - Musee virtuel du patrimoine culturel ivoirien (Meta Quest, OpenXR)",
 	"Modules": [

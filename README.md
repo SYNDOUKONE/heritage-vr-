@@ -20,11 +20,11 @@ Musée virtuel consacré aux cultures et patrimoines de Côte d'Ivoire, conçu p
 
 ## Démarrage rapide
 
-1. Cloner le dépôt puis ouvrir `HeritageVR.uproject` dans Unreal Engine 5.4+.
-2. Générer les fichiers projet Visual Studio / Rider (clic droit sur le `.uproject` → *Generate project files*).
-3. Compiler le module C++ `HeritageVR`.
-4. Tester sur PC : *Launch* avec un casque Link/Air Link, ou passer la cible sur Android pour un build Quest (`Platform → Android → Package Project`).
-5. Créer les maps listées dans `docs/CONTENT_PIPELINE.md` (la logique C++ s'y greffe par actors de `Source/HeritageVR/Museum`).
+1. Installer Unreal Engine 5.4, puis cloner le dépôt et ouvrir `HeritageVR.uproject`.
+2. Compiler le module C++ `HeritageVR` avec la toolchain de la plateforme.
+3. Créer les maps listées dans `docs/CONTENT_PIPELINE.md` (la logique C++ s'y greffe par actors de `Source/HeritageVR/Museum`).
+
+Pour le setup détaillé, les commandes de compilation et le test sur casque, voir [le guide macOS](docs/MACOS_SETUP.md). Sur Mac, le test VR se fait directement sur le Quest avec un APK sideloadé : Quest Link n'est pas disponible et la prévisualisation OpenXR HMD dans l'éditeur n'est pas prise en charge.
 
 ## Structure du dépôt
 

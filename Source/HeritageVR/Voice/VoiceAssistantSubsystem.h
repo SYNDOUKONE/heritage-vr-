@@ -2,9 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "AudioCaptureCore.h"
+#include "HttpFwd.h"
 #include "VoiceAssistantSubsystem.generated.h"
 
-class UAudioCapture;
 class UAudioComponent;
 class USoundWaveProcedural;
 
@@ -92,8 +93,7 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = "Voice|Service")
 	FString TtsEndpointUrl;
 
-	UPROPERTY(Transient)
-	TObjectPtr<UAudioCapture> Capture;
+	Audio::FAudioCapture Capture;
 
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> PlaybackComponent;
