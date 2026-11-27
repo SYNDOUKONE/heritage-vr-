@@ -53,10 +53,27 @@ def level_is_new(path):
     return True
 
 
+def ensure_lighting():
+    """Cree ou repare le soleil (movable, intensite explicite) et la lumiere de ciel."""
+    sun = find_by_label("Sun")
+    if not sun:
+        sun = spawn(unreal.DirectionalLight, (0.0, 0.0, 500.0), (-45.0, 30.0, 0.0), label="Sun")
+    sun_component = sun.get_editor_property("light_component")
+    sun_component.set_editor_property("mobility", unreal.ComponentMobility.MOVABLE)
+    sun_component.set_editor_property("intensity", 10.0)
+
+    sky = find_by_label("Sky")
+    if not sky:
+        sky = spawn(unreal.SkyLight, (0.0, 0.0, 500.0), label="Sky")
+    sky_component = sky.get_editor_property("light_component")
+    sky_component.set_editor_property("mobility", unreal.ComponentMobility.MOVABLE)
+
+    unreal.log("[bootstrap] eclairage verifie : soleil 10 lux movable + sky movable")
+
+
 def setup_ground_and_lights():
     place_static((0.0, 0.0, -50.0), (16.0, 16.0, 1.0), CUBE, label="Ground")
-    spawn(unreal.DirectionalLight, (0.0, 0.0, 500.0), (-45.0, 30.0, 0.0), label="Sun")
-    spawn(unreal.SkyLight, (0.0, 0.0, 500.0), label="Sky")
+    ensure_lighting()
     spawn(unreal.PlayerStart, (0.0, 600.0, 100.0), (0.0, 180.0, 0.0), label="PlayerStart")
 
 
@@ -252,6 +269,7 @@ def main():
     if level_is_new(WELCOME):
         setup_ground_and_lights()
     else:
+        ensure_lighting()
         unreal.log("[bootstrap] WelcomeHall existant : ajout/mise a jour des portails")
     build_hall_portals()
 
@@ -259,6 +277,7 @@ def main():
         if level_is_new(path):
             setup_ground_and_lights()
         else:
+            ensure_lighting()
             unreal.log("[bootstrap] niveau existant : " + path)
         builder()
         portal((0.0, -500.0), WELCOME, "Retour au hall du musée", "RetourHall_" + path.rsplit("/", 1)[-1])
