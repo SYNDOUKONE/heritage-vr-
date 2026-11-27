@@ -3,12 +3,14 @@
 #include "Player/HeritageVRPawn.h"
 
 #include "Camera/CameraComponent.h"
-#include "MotionControllerComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
 #include "Engine/OverlapResult.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Interaction/Interactable.h"
+#include "MotionControllerComponent.h"
 
 namespace
 {
@@ -17,10 +19,16 @@ namespace
 
 AHeritageVRPawn::AHeritageVRPawn()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	VRRoot = CreateDefaultSubobject<USceneComponent>(TEXT("VRRoot"));
 	SetRootComponent(VRRoot);
+
+	Capsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
+	Capsule->SetupAttachment(VRRoot);
+	Capsule->SetCapsuleRadius(30.f);
+	Capsule->SetCapsuleHalfHeight(90.f);
+	Capsule->SetCollisionProfileName(TEXT("Pawn"));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(VRRoot);
@@ -37,6 +45,29 @@ AHeritageVRPawn::AHeritageVRPawn()
 void AHeritageVRPawn::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AHeritageVRPawn::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// La capsule suit la position reelle du casque pour les volumes (zones, portails).
+	if (Camera && Capsule)
+	{
+		Capsule->SetWorldLocation(Camera->GetComponentLocation());
+	}
+
+	// Diagnostique affiché à l'écran : confirme que le pion et la caméra sont actifs
+	// même si la scène s'affiche noir (le texte passe au-dessus du rendu).
+	if (GEngine && Camera && GetWorld() && GetWorld()->GetTimeSeconds() >= NextDebugUpdateTime)
+	{
+		NextDebugUpdateTime = GetWorld()->GetTimeSeconds() + 1.0;
+		GEngine->AddOnScreenDebugMessage(1, 1.2f, FColor::Yellow, FString::Printf(
+			TEXT("HeritageVR | cam: %s %s | HMD: %s"),
+			*Camera->GetComponentLocation().ToCompactString(),
+			*Camera->GetComponentRotation().ToCompactString(),
+			UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayConnected() ? TEXT("connecte") : TEXT("desktop")));
+	}
 }
 
 void AHeritageVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

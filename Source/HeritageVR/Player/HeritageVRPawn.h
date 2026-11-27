@@ -4,6 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "HeritageVRPawn.generated.h"
 
+class UCapsuleComponent;
 class UCameraComponent;
 class UMotionControllerComponent;
 
@@ -16,6 +17,7 @@ class HERITAGEVR_API AHeritageVRPawn : public APawn
 public:
 	AHeritageVRPawn();
 
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 protected:
@@ -24,6 +26,10 @@ protected:
 	/** Origine du rig VR, suivie par le casque via le tracking OpenXR. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
 	TObjectPtr<USceneComponent> VRRoot;
+
+	/** Volume de collision suivant le casque : active les zones et portails du musee. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
+	TObjectPtr<UCapsuleComponent> Capsule;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VR")
 	TObjectPtr<UCameraComponent> Camera;
@@ -62,6 +68,8 @@ private:
 	AActor* FindInteractableNearHand(UMotionControllerComponent* Hand) const;
 	void PerformSnapTurn(float Degrees);
 	void ExecuteTeleport(const FVector& Destination);
+
+	double NextDebugUpdateTime = 0.0;
 
 	TWeakObjectPtr<UMotionControllerComponent> GrabbingHand;
 	TWeakObjectPtr<AActor> GrabbedObject;
