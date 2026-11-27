@@ -70,6 +70,8 @@ private:
 	void PerformSnapTurn(float Degrees);
 	void ExecuteTeleport(const FVector& Destination);
 
+	double NextDebugUpdateTime = 0.0;
+
 	TWeakObjectPtr<UMotionControllerComponent> GrabbingHand;
 	TWeakObjectPtr<UInteractable> GrabbedObject;
 	TWeakObjectPtr<UInteractable> FocusedObject;

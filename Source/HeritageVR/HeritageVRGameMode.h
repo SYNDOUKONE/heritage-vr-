@@ -12,4 +12,7 @@ class HERITAGEVR_API AHeritageVRGameMode : public AGameModeBase
 
 public:
 	AHeritageVRGameMode();
+
+protected:
+	virtual void BeginPlay() override;
 };
