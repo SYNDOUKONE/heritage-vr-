@@ -1,0 +1,30 @@
+# --- Unreal Engine generated / intermediate ---
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+Platforms/
+*.sln
+*.suo
+*.VC.db
+*.VC.opendb
+.vs/
+.vscode/
+.idea/
+*.code-workspace
+Debug/
+
+# --- UE plugin binaries checked into vendors ---
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+
+# --- OS / tooling ---
+.DS_Store
+Thumbs.db
+*.blend1
+__pycache__/
+
+# --- Local secrets for the voice pipeline ---
+Config/UserVoiceSecrets.ini
+*.env
