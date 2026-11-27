@@ -2,7 +2,6 @@
 
 #include "Voice/VoiceAssistantSubsystem.h"
 
-#include "AudioCapture.h"
 #include "Components/AudioComponent.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
@@ -26,10 +25,7 @@ void UVoiceAssistantSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UVoiceAssistantSubsystem::Deinitialize()
 {
-	if (Capture)
-	{
-		Capture->CloseStream();
-	}
+	ResetCapture();
 	Super::Deinitialize();
 }
 
@@ -58,43 +54,47 @@ void UVoiceAssistantSubsystem::StartListening()
 	ResetCapture();
 	CapturedSamples.Reset();
 
-	Capture = NewObject<UAudioCapture>(this);
-	if (!Capture->OpenDefaultAudioStream([this](const float* Samples, int32 NumSamples, int32 NumChannels, int32 SampleRate, double, bool)
+	Audio::FAudioCaptureDeviceParams CaptureParams;
+	if (!Capture.OpenAudioCaptureStream(CaptureParams, [this](const void* Buffer, int32 NumFrames, int32 NumChannels, int32 SampleRate, double, bool)
 	{
-		if (NumChannels <= 0)
+		if (!Buffer || NumChannels <= 0)
 		{
 			return;
 		}
-		const int32 Step = NumChannels;
+		const float* Samples = static_cast<const float*>(Buffer);
 		CapturedSampleRate = SampleRate;
 		CaptureSection.Lock();
-		for (int32 i = 0; i < NumSamples; i += Step)
+		for (int32 Frame = 0; Frame < NumFrames; ++Frame)
 		{
-			const float Clamped = FMath::Clamp(Samples[i], -1.f, 1.f);
+			const float Clamped = FMath::Clamp(Samples[Frame * NumChannels], -1.f, 1.f);
 			CapturedSamples.Add(static_cast<int16>(Clamped * static_cast<float>(TNumericLimits<int16>::Max())));
 		}
 		CaptureSection.Unlock();
-	}))
+	}, 1024))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("VoiceAssistant: ouverture du flux micro impossible"));
-		Capture = nullptr;
 		return;
 	}
 
-	Capture->StartStream();
+	if (!Capture.StartStream())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("VoiceAssistant: demarrage du flux micro impossible"));
+		ResetCapture();
+		return;
+	}
 	bListening = true;
 	OnStateChanged.Broadcast(true);
 }
 
 void UVoiceAssistantSubsystem::StopListeningAndSubmit()
 {
-	if (!bListening || !Capture)
+	if (!bListening || !Capture.IsCapturing())
 	{
 		return;
 	}
 
-	Capture->StopStream();
-	Capture->CloseStream();
+	Capture.StopStream();
+	Capture.CloseStream();
 	bListening = false;
 	OnStateChanged.Broadcast(false);
 
@@ -271,12 +271,11 @@ void UVoiceAssistantSubsystem::QueueReplyForPlayback(const TArray<uint8>& AudioB
 	PlaybackWave->SetSampleRate(SampleRate > 0 ? SampleRate : kSampleRate);
 	PlaybackWave->NumChannels = kNumChannels;
 	PlaybackWave->SoundGroup = SOUNDGROUP_Voice;
-	PlaybackWave->bCanProcessLoop = false;
 	PlaybackWave->bLooping = false;
 
 	const int32 NumSamples = AudioBytes.Num() / sizeof(int16);
 	PlaybackWave->Duration = static_cast<float>(NumSamples) / static_cast<float>(PlaybackWave->GetSampleRateForCurrentPlatform());
-	PlaybackWave->QueueAudio(AudioBytes);
+	PlaybackWave->QueueAudio(AudioBytes.GetData(), AudioBytes.Num());
 
 	if (!PlaybackComponent)
 	{
@@ -291,11 +290,15 @@ void UVoiceAssistantSubsystem::QueueReplyForPlayback(const TArray<uint8>& AudioB
 
 void UVoiceAssistantSubsystem::ResetCapture()
 {
-	if (Capture)
+	if (Capture.IsStreamOpen())
 	{
-		Capture->CloseStream();
+		if (Capture.IsCapturing())
+		{
+			Capture.StopStream();
+		}
+		Capture.CloseStream();
 	}
-	Capture = nullptr;
+	bListening = false;
 }
 
 void UVoiceAssistantSubsystem::BuildWavHeader(TArray<uint8>& OutWav, const TArray<int16>& PcmSamples, int32 SampleRate, int32 NumChannels)

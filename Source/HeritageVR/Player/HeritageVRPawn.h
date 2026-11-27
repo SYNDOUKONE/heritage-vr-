@@ -6,7 +6,6 @@
 
 class UCameraComponent;
 class UMotionControllerComponent;
-class UInteractable;
 
 /** Pion VR du visiteur : teleportation, snap turn, saisie d'artefacts. */
 UCLASS()
@@ -60,11 +59,10 @@ private:
 	void OnGrabReleased(UMotionControllerComponent* Hand);
 
 	bool TryGetTeleportDestination(FVector& OutLocation) const;
-	UInteractable* FindInteractableNearHand(UMotionControllerComponent* Hand) const;
+	AActor* FindInteractableNearHand(UMotionControllerComponent* Hand) const;
 	void PerformSnapTurn(float Degrees);
 	void ExecuteTeleport(const FVector& Destination);
 
 	TWeakObjectPtr<UMotionControllerComponent> GrabbingHand;
-	TWeakObjectPtr<UInteractable> GrabbedObject;
-	TWeakObjectPtr<UInteractable> FocusedObject;
+	TWeakObjectPtr<AActor> GrabbedObject;
 };

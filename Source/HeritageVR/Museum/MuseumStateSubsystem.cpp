@@ -52,5 +52,9 @@ int32 UMuseumStateSubsystem::GetExaminedArtifactCount() const
 
 void UMuseumStateSubsystem::GetVisitedVillages(TArray<FName>& OutVillages) const
 {
-	VisitedVillages.GetKeys(OutVillages);
+	OutVillages.Reset(VisitedVillages.Num());
+	for (const FName VillageId : VisitedVillages)
+	{
+		OutVillages.Add(VillageId);
+	}
 }

@@ -5,7 +5,7 @@
 #include "MuseumStateSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVillageVisited, FName, VillageId);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnArtifactExamined, FName, ArtifactId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnArtifactProgressExamined, FName, ArtifactId);
 
 /** Progression du visiteur : villages visites et artefacts examines. */
 UCLASS(Config = Game)
@@ -41,7 +41,7 @@ public:
 	FOnVillageVisited OnVillageVisited;
 
 	UPROPERTY(BlueprintAssignable, Category = "Museum|Progress")
-	FOnArtifactExamined OnArtifactExamined;
+	FOnArtifactProgressExamined OnArtifactExamined;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Museum|Progress")

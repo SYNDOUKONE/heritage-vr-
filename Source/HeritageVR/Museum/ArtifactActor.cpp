@@ -3,7 +3,7 @@
 #include "Museum/ArtifactActor.h"
 
 #include "Components/AudioComponent.h"
-#include "Components/MotionControllerComponent.h"
+#include "MotionControllerComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Sound/SoundBase.h"

@@ -1,0 +1,8 @@
+Setting up bundled DotNet SDK
+/Users/Shared/UE_5.5/Engine/Build/BatchFiles/Mac/../../../Binaries/ThirdParty/DotNet/8.0.300/mac-x64
+Running dotnet Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.dll HeritageVREditor Mac Development -project=/Users/oda_51/Downloads/heritage-vr-/HeritageVR.uproject -WaitMutex
+Log file: /Users/oda_51/Documents/Library/Application Support/Epic/UnrealBuildTool/Log.txt
+Using 'git status' to determine working set for adaptive non-unity build (/Users/oda_51/Downloads/heritage-vr-).
+Creating makefile for HeritageVREditor (no existing makefile)
+Total execution time: 1.97 seconds
+Platform Mac is not a valid platform to build. Check that the SDK is installed properly and that you have the necessary platform support files (DataDrivenPlatformInfo.ini, SDK.json, etc).
