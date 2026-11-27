@@ -19,3 +19,16 @@ Crée `/Game/Maps/WelcomeHall` (la map de démarrage définie dans `Config/Defau
 Le niveau est jouable immédiatement : **Play VR** (casque en Link) ou vue desktop.
 Les artefacts de démonstration utilisent le cube de base du moteur — à remplacer par les
 vrais meshes produits via `Tools/Blender/artifact_pipeline.py`.
+
+## `bootstrap_full_museum.py`
+
+Génère **tout le musée d'un coup** : le hall d'accueil (4 portails de voyage) + les 4 villages
+(`Baoule_Village`, `Senoufo_Village`, `Dan_Yacouba_Village`, `GrandBassam_Quartier`), chacun avec
+son `AVillageZone`, son architecture placeholder et ses artefacts documentés (masque Goli,
+masque Kpan, Asiè usu, pagne ikat, Kponiugo, masque du Poro, trompe, Dege, Dean Gle, Gunye Ge,
+Wakemia, mobilier colonial de Grand-Bassam...). Un portail de retour au hall est posé dans
+chaque village.
+
+Prérequis : compiler d'abord le module C++ (nouveauté : `AVillagePortal` et la capsule de
+collision du pion, qui alimentent les zones et portails). Le script est ré-exécutable :
+les niveaux existants sont complétés sans doublons de portails.

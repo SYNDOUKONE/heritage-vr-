@@ -3,6 +3,7 @@
 #include "Player/HeritageVRPawn.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/MotionControllerComponent.h"
 #include "Components/SceneComponent.h"
 #include "Engine/World.h"
@@ -17,10 +18,16 @@ namespace
 
 AHeritageVRPawn::AHeritageVRPawn()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	VRRoot = CreateDefaultSubobject<USceneComponent>(TEXT("VRRoot"));
 	SetRootComponent(VRRoot);
+
+	Capsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
+	Capsule->SetupAttachment(VRRoot);
+	Capsule->SetCapsuleRadius(30.f);
+	Capsule->SetCapsuleHalfHeight(90.f);
+	Capsule->SetCollisionProfileName(TEXT("Pawn"));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(VRRoot);
@@ -39,6 +46,17 @@ AHeritageVRPawn::AHeritageVRPawn()
 void AHeritageVRPawn::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AHeritageVRPawn::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// La capsule suit la position reelle du casque pour les volumes (zones, portails).
+	if (Camera && Capsule)
+	{
+		Capsule->SetWorldLocation(Camera->GetComponentLocation());
+	}
 }
 
 void AHeritageVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
