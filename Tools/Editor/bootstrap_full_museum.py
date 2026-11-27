@@ -71,9 +71,20 @@ def ensure_lighting():
     unreal.log("[bootstrap] eclairage verifie : soleil 10 lux movable + sky movable")
 
 
+def ensure_welcome_sign(text="Bienvenue au musee"):
+    """Panneau 3D non eclaire : visible meme sans aucune lumiere (test de rendu)."""
+    if find_by_label("WelcomeSign"):
+        return
+    sign = spawn(unreal.TextRenderActor, (0.0, 480.0, 220.0), (0.0, 180.0, 0.0), label="WelcomeSign")
+    component = sign.get_editor_property("text_render_component")
+    component.set_editor_property("text", unreal.Text(text))
+    component.set_editor_property("world_size", 40.0)
+
+
 def setup_ground_and_lights():
     place_static((0.0, 0.0, -50.0), (16.0, 16.0, 1.0), CUBE, label="Ground")
     ensure_lighting()
+    ensure_welcome_sign()
     spawn(unreal.PlayerStart, (0.0, 600.0, 100.0), (0.0, 180.0, 0.0), label="PlayerStart")
 
 
@@ -270,6 +281,7 @@ def main():
         setup_ground_and_lights()
     else:
         ensure_lighting()
+        ensure_welcome_sign()
         unreal.log("[bootstrap] WelcomeHall existant : ajout/mise a jour des portails")
     build_hall_portals()
 
@@ -278,6 +290,7 @@ def main():
             setup_ground_and_lights()
         else:
             ensure_lighting()
+            ensure_welcome_sign()
             unreal.log("[bootstrap] niveau existant : " + path)
         builder()
         portal((0.0, -500.0), WELCOME, "Retour au hall du musée", "RetourHall_" + path.rsplit("/", 1)[-1])
