@@ -34,6 +34,7 @@ Config/                      Réglages moteur, inputs VR, assistant vocal
 Source/HeritageVR/           Module C++ (pion VR, artefacts, villages, voix)
 Content/README.md            Conventions de contenu (maps, artefacts, audio)
 Tools/Blender/               Scripts Python de production et d'optimisation
+Tools/Editor/                Script Python d'editeur : generation du WelcomeHall
 docs/                        Architecture, pipeline de contenu, assistant vocal
 ```
 
